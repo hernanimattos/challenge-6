@@ -1,5 +1,12 @@
-import { Column, PrimaryGeneratedColumn, Entity } from 'typeorm';
-@Entity('cetegory')
+import {
+  Column,
+  PrimaryGeneratedColumn,
+  Entity,
+  UpdateDateColumn,
+  CreateDateColumn,
+} from 'typeorm';
+
+@Entity('categories')
 class Category {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -7,10 +14,10 @@ class Category {
   @Column()
   title: string;
 
-  @Column()
+  @CreateDateColumn()
   created_at: Date;
 
-  @Column()
+  @UpdateDateColumn()
   updated_at: Date;
 }
 

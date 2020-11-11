@@ -5,11 +5,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   JoinColumn,
-  OneToOne,
+  ManyToOne,
 } from 'typeorm';
 import Category from './Category';
 
-@Entity('transaction')
+@Entity('transactions')
 class Transaction {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -17,17 +17,18 @@ class Transaction {
   @Column()
   title: string;
 
-  @Column({
-    type: 'enum',
-    enum: ['income', 'outcome'],
-  })
+  @Column()
   type: 'income' | 'outcome';
 
-  @Column()
+  @Column('decimal')
   value: number;
 
+  @ManyToOne(() => Category)
+  @JoinColumn({ name: 'category_id' })
+  category: Category;
+
   @Column()
-  category_id: string;
+  category_id: Category;
 
   @CreateDateColumn()
   created_at: Date;
