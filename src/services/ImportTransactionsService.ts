@@ -10,7 +10,7 @@ interface CsvTransaction {
   title: string;
   type: 'income' | 'outcome';
   value: number;
-  category: Array<string>;
+  category: string;
 }
 
 class ImportTransactionsService {
@@ -44,7 +44,36 @@ class ImportTransactionsService {
       },
     });
 
-    console.log(existCategories, '----');
+    const existCategoriesTitle = existCategories.map(
+      (cat: Category) => cat.title,
+    );
+
+    const addCategoryTitles = categories
+      .filter(cat => !existCategoriesTitle.includes(cat))
+      .filter((value, index, self) => self.indexOf(value) === index);
+
+    const newCategories = categoriesRepository.create(
+      addCategoryTitles.map(title => ({ title })),
+    );
+
+    await categoriesRepository.save(newCategories);
+
+    const finalCategories = [...newCategories, ...existCategories];
+
+    const createTransactions = transactionRepository.create(
+      transactions.map(trans => ({
+        title: trans.title,
+        type: trans.type,
+        value: trans.value,
+        category: finalCategories.find(cat => cat.title === trans.category),
+      })),
+    );
+
+    await transactionRepository.save(createTransactions);
+
+    await fs.promises.unlink(filePath);
+
+    return createTransactions;
   }
 }
 
